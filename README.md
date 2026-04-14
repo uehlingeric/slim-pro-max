@@ -1,6 +1,18 @@
 # Slim Pro Max
 
-UI/UX design intelligence skill for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). A searchable design database with BM25 ranking that generates design system recommendations across 10+ tech stacks.
+A fork of [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) by [Next Level Builder](https://github.com/nextlevelbuilder), restructured for better token efficiency in [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
+
+## What Changed From the Original
+
+The original ui-ux-pro-max-skill is a design intelligence database with BM25 search. This fork keeps the same core data and search algorithm but restructures how results are delivered to reduce token consumption in Claude Code sessions:
+
+- **Master + Overrides persistence** — design system recommendations are written to `MASTER.md` and page-specific override files (`design-system/pages/{page}.md`), so the same design context doesn't need to be re-queried and re-injected into every conversation turn. The original is stateless per-session.
+- **Reference file separation** — quick-reference rules, common UI standards, and a pre-delivery checklist are broken into standalone files in `references/` that the skill loads on demand, rather than inlining all guidance into a single prompt. This lets Claude read only the relevant reference for the current task.
+- **Result selection scoring** — the design system generator applies priority-weighted scoring against the `ui-reasoning.csv` ruleset when selecting which BM25 results to surface, reducing irrelevant results that waste context tokens.
+- **Output truncation** — long CSV field values are capped at 300 characters in search output. The original returns full field content.
+- **Skill definition as routing layer** — `SKILL.md` defines when to use each search domain and reference file, so Claude doesn't load the entire knowledge base speculatively. The original skill definition is more monolithic.
+
+Everything else — the BM25 implementation, CSV data files, domain structure, and search interface — comes directly from the original project.
 
 ## What It Does
 
@@ -129,6 +141,10 @@ The search engine is a from-scratch BM25 implementation (~160 lines) with no dep
 | 9 | Navigation Patterns | HIGH |
 | 10 | Charts & Data | LOW |
 
+## Attribution
+
+This project is a fork of [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) by [Next Level Builder](https://github.com/nextlevelbuilder). The original project's BM25 search engine, CSV data architecture, and design domain structure are the foundation this fork builds on.
+
 ## License
 
-MIT
+MIT (same as the [original project](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill))
